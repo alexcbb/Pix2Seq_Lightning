@@ -6,7 +6,7 @@
 #SBATCH -A uli@v100
 #SBATCH -C v100-32g
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 #SBATCH --ntasks-per-node=1 #number of MPI tasks per node (=number of GPUs per node)
 #SBATCH --hint=nomultithread
 #SBATCH -t 20:00:00

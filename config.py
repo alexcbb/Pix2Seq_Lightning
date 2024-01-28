@@ -7,10 +7,10 @@ class CFG:
     img_size = 384
     num_bins = img_size
     
-    batch_size = 64
+    batch_size = 1024
     epochs = 30
     precision = 16
-    gpus = 1
+    gpus = 4
     nodes = 1
     strategy = "ddp"
     

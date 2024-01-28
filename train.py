@@ -20,6 +20,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------
     # Prepare data
     datamodule = YCBDatamodule(cfg)
+    datamodule.setup("fit")
     
     cfg.num_training_steps = CFG.epochs * \
         (len(datamodule.ycb_train) // CFG.batch_size)

@@ -44,11 +44,11 @@ class YCBDatamodule(L.LightningDataModule):
             A.RandomBrightnessContrast(p=0.2),
             A.Resize(cfg.img_size, cfg.img_size),
             A.Normalize(),
-        ])
+        ], bbox_params={'format': 'pascal_voc', 'label_fields': ['obj_class']})
         self.val_transforms = A.Compose([
             A.Resize(cfg.img_size, cfg.img_size),
             A.Normalize(),
-        ])
+        ], bbox_params={'format': 'pascal_voc', 'label_fields': ['obj_class']})
 
         self.tokenizer = Tokenizer(
                     num_classes=cfg.num_classes, 

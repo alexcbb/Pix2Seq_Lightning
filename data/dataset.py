@@ -59,9 +59,13 @@ class YCBDataset(Dataset):
 
         if self.transforms is not None:
             transformed = self.transforms(**{
-                'image': img
+                'image': img,
+                'bboxes': bboxes,
+                'obj_class': obj_class
             })
             img = transformed['image']
+            bboxes = transformed['bboxes']
+            obj_class = transformed['obj_class']
 
         img = torch.FloatTensor(img).permute(2, 0, 1)
 

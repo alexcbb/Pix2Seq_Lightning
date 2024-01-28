@@ -35,7 +35,7 @@ class YCBDataset(Dataset):
                     obj_class= gt_pose[scene][obj]['obj_id']
                     obj_trans = gt_pose[scene][obj]['cam_t_m2c']
                     obj_rot = gt_pose[scene][obj]['cam_R_m2c']
-                    img_path = scenes_train[i] + 'rgb/' + scene + '.png'
+                    img_path = scenes_train[i] + '/rgb/' + str(scene).zfill(6) + '.png'
                     self.labels.append(
                         {
                         "bbox" : bbox, 
@@ -51,7 +51,10 @@ class YCBDataset(Dataset):
 
     def __getitem__(self, idx):
         sample = self.labels[idx]
+        print(f"Current idx: {idx}")
+        print(f"Current sample: {sample}")
         img_path = sample['img_path']
+        print(f"Current image path : {img_path}")
 
         img = cv2.imread(img_path)[..., ::-1]
         obj_class = sample['obj_class']

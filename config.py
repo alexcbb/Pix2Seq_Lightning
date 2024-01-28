@@ -21,7 +21,7 @@ class CFG:
     weight_decay = 1e-4
     
     num_classes = 21
-    num_workers = 8
+    num_workers = 0
     
     generation_steps = 101
     run_eval = False

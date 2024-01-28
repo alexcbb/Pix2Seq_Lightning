@@ -4,7 +4,7 @@
 #SBATCH --error=logs/pix2seq.%j.err
 
 #SBATCH -A uli@v100
-#SBATCH --partition=gpu_p2
+#SBATCH -C v100-32g
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4
 #SBATCH --ntasks-per-node=4 #number of MPI tasks per node (=number of GPUs per node)

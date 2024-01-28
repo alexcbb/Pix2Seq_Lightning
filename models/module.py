@@ -68,8 +68,8 @@ class Pix2Seq(L.LightningModule):
 
         self.loss_meter_val.update(loss.item(), image.size(0))   
 
-        obj_class, bbox = self.tokenizer.decode_batch(preds)
-        gt_obj_class, gt_bbox = self.tokenizer.decode_batch(tgt)
+        obj_class, bbox = self.tokenizer.decode(preds)
+        gt_obj_class, gt_bbox = self.tokenizer.decode(tgt)
         vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox[0], gt_obj_class[0], GT_COLOR, show=True)
         vis_image  = self.visualize(vis_image, bbox[0], obj_class[0], PRED_COLOR, show=True)
 

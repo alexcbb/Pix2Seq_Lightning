@@ -92,7 +92,6 @@ class Pix2Seq(L.LightningModule):
 
     def visualize_bbox(self, img, bbox, class_name, color, thickness=1):
         """Visualizes a single bounding box on the image"""
-        print(f"Create bbox for {class_name} with bbox {bbox}")
         bbox = [int(item) for item in bbox]
         x_min, y_min, x_max, y_max = bbox
     
@@ -114,9 +113,11 @@ class Pix2Seq(L.LightningModule):
 
     def visualize(self, image, bboxes, category_ids, color=PRED_COLOR, show=True):
         img = image.copy()
+        print(f"Create visualization for {category_ids} with bbox {bboxes}")
         for bbox, category_id in zip(bboxes, category_ids):
             class_name = self.cfg.id2cls[str(max(category_id, 0))]
             img = self.visualize_bbox(img, bbox, class_name, color)
+            break
         if show:
             plt.figure(figsize=(12, 12))
             plt.axis('off')

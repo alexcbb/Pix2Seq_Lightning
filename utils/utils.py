@@ -16,8 +16,8 @@ def seed_everything(seed=1234):
     torch.backends.cudnn.deterministic = True
 
 
-def generate_square_subsequent_mask(sz):
-    mask = (torch.triu(torch.ones((sz, sz), device=sz.device))
+def generate_square_subsequent_mask(sz, device=None):
+    mask = (torch.triu(torch.ones((sz, sz), device=device))
             == 1).transpose(0, 1)
     mask = mask.float().masked_fill(mask == 0, float(
         '-inf')).masked_fill(mask == 1, float(0.0))
@@ -30,7 +30,7 @@ def create_mask(tgt):
     """
     tgt_seq_len = tgt.shape[1]
 
-    tgt_mask = generate_square_subsequent_mask(tgt_seq_len)
+    tgt_mask = generate_square_subsequent_mask(tgt_seq_len, device=tgt.device)
     tgt_padding_mask = (tgt == CFG.pad_idx)
 
     return tgt_mask, tgt_padding_mask

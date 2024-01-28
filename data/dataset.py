@@ -10,7 +10,7 @@ class YCBDataset(Dataset):
             self, 
             path_to_dataset, 
             transforms=None, 
-            tokenizer=None
+            tokenizer=None,
         ):
         scenes_train = glob(path_to_dataset + "/*/", recursive = True)
 
@@ -38,7 +38,7 @@ class YCBDataset(Dataset):
                         }
                 for obj in range(len(gt_pose[scene])):
                     bbox = gt_bbox[scene][obj]['bbox_obj']
-                    bbox = [bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]] # xmin, ymin, xmax, ymax
+                    bbox = [max(0, bbox[0]), max(0, bbox[1]), min(bbox[0] + bbox[2], 640), min(bbox[1] + bbox[3], 480)] # xmin, ymin, xmax, ymax
                     obj_class= gt_pose[scene][obj]['obj_id']
                     obj_trans = gt_pose[scene][obj]['cam_t_m2c']
                     obj_rot = gt_pose[scene][obj]['cam_R_m2c']

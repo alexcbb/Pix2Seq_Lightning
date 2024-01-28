@@ -10,11 +10,11 @@ from transformers import top_k_top_p_filtering
 from map_boxes import mean_average_precision_for_boxes
 
 
-from utils import seed_everything
+from utils.utils import seed_everything
 from preprocess import build_df
-from dataset import split_df, get_loaders
-from tokenizer import Tokenizer
-from model import Encoder, Decoder, EncoderDecoder
+from data.dataset import split_df, get_loaders
+from data.tokenizer import Tokenizer
+from models.model import Encoder, Decoder, EncoderDecoder
 from config import CFG
 
 def generate(model, x, tokenizer, max_len=50, top_k=0, top_p=1):

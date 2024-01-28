@@ -1,27 +1,19 @@
-import timm
-import torch
-from torch import nn
+import torch 
+import torch.nn as nn
+from utils.utils import create_mask
 from timm.models.layers import trunc_normal_
 
-
 from config import CFG
-from utils import create_mask
-
-
-class Encoder(nn.Module):
-    def __init__(self, model_name='deit3_small_patch16_384_in21ft1k', pretrained=False, out_dim=256):
-        super().__init__()
-        self.model = timm.create_model(
-            model_name, num_classes=0, global_pool='', pretrained=pretrained)
-        self.bottleneck = nn.AdaptiveAvgPool1d(out_dim)
-
-    def forward(self, x):
-        features = self.model(x)
-        return self.bottleneck(features[:, 1:])
-
 
 class Decoder(nn.Module):
-    def __init__(self, vocab_size, encoder_length, dim, num_heads, num_layers):
+    def __init__(
+            self, 
+            vocab_size, 
+            encoder_length, 
+            dim, 
+            num_heads, 
+            num_layers
+        ):
         super().__init__()
         self.dim = dim
         
@@ -51,7 +43,11 @@ class Decoder(nn.Module):
         trunc_normal_(self.decoder_pos_embed, std=.02)
         
     
-    def forward(self, encoder_out, tgt):
+    def forward(
+            self, 
+            encoder_out, 
+            tgt
+        ):
         """
         encoder_out: shape(N, L, D)
         tgt: shape(N, L)
@@ -78,7 +74,11 @@ class Decoder(nn.Module):
         preds = preds.transpose(0, 1)
         return self.output(preds)
     
-    def predict(self, encoder_out, tgt):
+    def predict(
+            self, 
+            encoder_out, 
+            tgt
+        ):
         length = tgt.size(1)
         padding = torch.ones(tgt.size(0), CFG.max_len-length-1).fill_(CFG.pad_idx).long().to(tgt.device)
         tgt = torch.cat([tgt, padding], dim=1)
@@ -103,18 +103,3 @@ class Decoder(nn.Module):
         
         preds = preds.transpose(0, 1)
         return self.output(preds)[:, length-1, :]
-
-class EncoderDecoder(nn.Module):
-    def __init__(self, encoder, decoder):
-        super().__init__()
-        self.encoder = encoder
-        self.decoder = decoder
-    
-    def forward(self, image, tgt):
-        encoder_out = self.encoder(image)
-        preds = self.decoder(encoder_out, tgt)
-        return preds
-    def predict(self, image, tgt):
-        encoder_out = self.encoder(image)
-        preds = self.decoder.predict(encoder_out, tgt)
-        return preds

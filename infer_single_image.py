@@ -5,10 +5,10 @@ import torch
 from tqdm import tqdm
 import numpy as np
 
-from dataset import VOCDatasetTest
-from model import Encoder, Decoder, EncoderDecoder
+from data.dataset import VOCDatasetTest
+from models.model import Encoder, Decoder, EncoderDecoder
 from test import generate, postprocess
-from tokenizer import Tokenizer
+from data.tokenizer import Tokenizer
 from config import CFG
 from visualize import visualize
 

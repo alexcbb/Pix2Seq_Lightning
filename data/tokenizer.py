@@ -2,7 +2,31 @@ import numpy as np
 import torch
 
 class Tokenizer:
-    def __init__(self, num_classes: int, num_bins: int, width: int, height: int, max_len=500):
+    def __init__(
+            self, 
+            num_classes: int, 
+            num_bins: int, 
+            width: int, 
+            height: int, 
+            tx: int = 0,
+            ty: int = 0,
+            tz: int = 0,
+            rx :int = 0,
+            ry: int = 0,
+            rz: int = 0,
+            max_len=500
+        ):
+        """
+        Tokenizer that transforms objects classes and coordinates into tokens
+        """
+        # TODO : implement tokenization for 6D pose
+        self.tx = tx
+        self.ty = ty
+        self.tz = tz
+        self.rx = rx
+        self.ry = ry
+        self.rz = rz
+
         self.num_classes = num_classes
         self.num_bins = num_bins
         self.width = width
@@ -27,12 +51,18 @@ class Tokenizer:
         """
         return x.astype('float32') / (self.num_bins - 1)
 
-    def __call__(self, labels: list, bboxes: list, shuffle=True):
-        assert len(labels) == len(bboxes), "labels and bboxes must have the same length"
+    def __call__(
+            self, 
+            obj_class: list, 
+            bboxes: list, 
+            pose: list = None,
+            shuffle=True
+        ):
+        assert len(obj_class) == len(bboxes), "labels and bboxes must have the same length"
         bboxes = np.array(bboxes)
-        labels = np.array(labels)
-        labels += self.num_bins
-        labels = labels.astype('int')[:self.max_len]
+        obj_class = np.array(obj_class)
+        obj_class += self.num_bins
+        obj_class = obj_class.astype('int')[:self.max_len]
 
         bboxes[:, 0] = bboxes[:, 0] / self.width
         bboxes[:, 2] = bboxes[:, 2] / self.width
@@ -41,23 +71,30 @@ class Tokenizer:
 
         bboxes = self.quantize(bboxes)[:self.max_len]
 
+        # TODO : quantize the 6D pose
+        if pose is not None:
+            pass
+
         if shuffle:
             rand_idxs = np.arange(0, len(bboxes))
             np.random.shuffle(rand_idxs)
-            labels = labels[rand_idxs]
+            obj_class = obj_class[rand_idxs]
             bboxes = bboxes[rand_idxs]
 
         tokenized = [self.BOS_code]
-        for label, bbox in zip(labels, bboxes):
+        for obj, bbox in zip(obj_class, bboxes):
             tokens = list(bbox)
-            tokens.append(label)
+            tokens.append(obj)
 
             tokenized.extend(list(map(int, tokens)))
         tokenized.append(self.EOS_code)
 
         return tokenized    
     
-    def decode(self, tokens: torch.tensor):
+    def decode(
+            self, 
+            tokens: torch.tensor
+        ):
         """
         toekns: torch.LongTensor with shape [L]
         """
@@ -66,14 +103,20 @@ class Tokenizer:
         tokens = tokens[1:-1]
         assert len(tokens) % 5 == 0, "invalid tokens"
 
-        labels = []
+        obj_class = []
         bboxes = []
+        pose = []
         for i in range(4, len(tokens)+1, 5):
-            label = tokens[i]
+            obj = tokens[i]
             bbox = tokens[i-4: i]
-            labels.append(int(label))
+            obj_class.append(int(obj))
             bboxes.append([int(item) for item in bbox])
-        labels = np.array(labels) - self.num_bins
+        obj_class = np.array(obj_class) - self.num_bins
+
+        # TODO : dequantize the 6D pose
+        if len(pose) > 0:
+            pass
+
         bboxes = np.array(bboxes)
         bboxes = self.dequantize(bboxes)
         
@@ -82,4 +125,4 @@ class Tokenizer:
         bboxes[:, 1] = bboxes[:, 1] * self.height
         bboxes[:, 3] = bboxes[:, 3] * self.height
         
-        return labels, bboxes
+        return obj_class, bboxes

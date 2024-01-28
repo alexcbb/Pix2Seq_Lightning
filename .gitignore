@@ -6,3 +6,4 @@ VOCdevkit
 *.tar
 *.pth
 results
+checkpoints/*

@@ -17,8 +17,8 @@ class YCBDataset(Dataset):
         train_pose_gt_files = []
         train_bbox_gt_files = []
         for scene in scenes_train:
-            train_pose_gt_files.append(glob(scene + "scene_gt.json"))    
-            train_bbox_gt_files.append(glob(scene + "scene_gt_info.json"))    
+            train_pose_gt_files.append(scene + "/scene_gt.json")   
+            train_bbox_gt_files.append(scene + "/scene_gt_info.json")    
 
         self.labels = []
         for i in range(len(train_pose_gt_files)):

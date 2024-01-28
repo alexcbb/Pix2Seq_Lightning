@@ -70,8 +70,8 @@ class Pix2Seq(L.LightningModule):
 
         obj_class, bbox = self.tokenizer.decode(preds[0])
         gt_obj_class, gt_bbox = self.tokenizer.decode(tgt[0])
-        vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox[:-1], gt_obj_class[:-1], GT_COLOR, show=True)
-        vis_image  = self.visualize(vis_image, bbox[:-1], obj_class[:-1], PRED_COLOR, show=True)
+        vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox, gt_obj_class, GT_COLOR, show=True)
+        vis_image  = self.visualize(vis_image, bbox, obj_class, PRED_COLOR, show=True)
 
         self.log('val_loss', self.loss_meter_val.avg, sync_dist=True)
         self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)

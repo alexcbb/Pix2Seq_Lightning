@@ -47,6 +47,7 @@ class YCBDataset(Dataset):
                     )
         self.transforms = transforms
         self.tokenizer = tokenizer
+        print(f"Load dataset at path {path_to_dataset} with size: {len(self.labels)}")
 
     def __getitem__(self, idx):
         sample = self.labels[idx]

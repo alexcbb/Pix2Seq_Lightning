@@ -1,5 +1,5 @@
 class CFG:
-    ycb_path = './dataset/ycb/'
+    ycb_path = './dataset/ycbv/'
     ycb_train = ycb_path + 'train_real/'
     ycb_test = ycb_path + 'test/'
     

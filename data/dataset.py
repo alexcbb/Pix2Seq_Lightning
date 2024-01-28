@@ -68,6 +68,7 @@ class YCBDataset(Dataset):
 
         img = torch.FloatTensor(img).permute(2, 0, 1)
 
+        # Converts the labels to a sequence for the autoregressive decoder
         if self.tokenizer is not None:
             seqs = self.tokenizer(obj_class, bboxes)
             seqs = torch.LongTensor(seqs)
@@ -76,5 +77,5 @@ class YCBDataset(Dataset):
         return img, obj_class, bboxes
 
     def __len__(self):
-        return len(self.ids)
+        return len(self.labels)
 

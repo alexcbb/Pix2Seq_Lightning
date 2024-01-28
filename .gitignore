@@ -7,3 +7,4 @@ VOCdevkit
 *.pth
 results
 checkpoints/*
+logs/*

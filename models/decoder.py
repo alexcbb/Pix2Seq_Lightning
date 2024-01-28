@@ -3,11 +3,10 @@ import torch.nn as nn
 from utils.utils import create_mask
 from timm.models.layers import trunc_normal_
 
-from config import CFG
-
 class Decoder(nn.Module):
     def __init__(
             self, 
+            cfg,
             vocab_size, 
             encoder_length, 
             dim, 
@@ -16,9 +15,10 @@ class Decoder(nn.Module):
         ):
         super().__init__()
         self.dim = dim
+        self.cfg = cfg
         
         self.embedding = nn.Embedding(vocab_size, dim)
-        self.decoder_pos_embed = nn.Parameter(torch.randn(1, CFG.max_len-1, dim) * .02)
+        self.decoder_pos_embed = nn.Parameter(torch.randn(1, self.cfg.max_len-1, dim) * .02)
         self.decoder_pos_drop = nn.Dropout(p=0.05)
         
         decoder_layer = nn.TransformerDecoderLayer(d_model=dim, nhead=num_heads)
@@ -80,7 +80,7 @@ class Decoder(nn.Module):
             tgt
         ):
         length = tgt.size(1)
-        padding = torch.ones(tgt.size(0), CFG.max_len-length-1).fill_(CFG.pad_idx).long().to(tgt.device)
+        padding = torch.ones(tgt.size(0), self.cfg.max_len-length-1).fill_(self.cfg.pad_idx).long().to(tgt.device)
         tgt = torch.cat([tgt, padding], dim=1)
         tgt_mask, tgt_padding_mask = create_mask(tgt)
         # is it necessary to multiply it by math.sqrt(d) ?

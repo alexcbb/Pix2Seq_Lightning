@@ -20,7 +20,7 @@ class CFG:
     img_size = 384
     num_bins = img_size
     
-    batch_size = 16
+    batch_size = 1024
     epochs = 25
     precision = 16
     gpus = 1
@@ -57,10 +57,10 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------
     # Prepare Lightning module
     encoder = Encoder(model_name=CFG.model_name, pretrained=True, out_dim=256)
-    decoder = Decoder(vocab_size=datamodule.tokenizer.vocab_size,
+    decoder = Decoder(cfg, vocab_size=datamodule.tokenizer.vocab_size,
                       encoder_length=CFG.num_patches, dim=256, num_heads=8, num_layers=6)
 
-    module = Pix2Seq(cfg, encoder, decoder)
+    module = Pix2Seq(cfg, encoder, decoder, datamodule.tokenizer)
 
     # ---------------------------------------------------------------------------------
     # Prepare logger
@@ -99,6 +99,6 @@ if __name__ == '__main__':
         "log_every_n_steps": 10,
         "check_val_every_n_epoch": 1
     }
-    
+
     trainer = L.Trainer(**trainer_args)
     trainer.fit(module, datamodule)

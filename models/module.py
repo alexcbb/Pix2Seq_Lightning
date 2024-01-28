@@ -2,15 +2,24 @@ import lightning as L
 import torch
 from torch import nn
 from utils.utils import AvgMeter, get_lr
-from config import CFG
-from transformers import get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup, top_k_top_p_filtering
+import cv2
+import matplotlib.pyplot as plt
+
+import torch
+
+GT_COLOR = (0, 255, 0) # Green
+PRED_COLOR = (255, 0, 0) # Red
+TEXT_COLOR = (255, 255, 255) # White
 
 # TODO : check "engine.py" pour ré-implémenter
 class Pix2Seq(L.LightningModule):
-    def __init__(self, cfg, encoder, decoder):
+    def __init__(self, cfg, encoder, decoder, tokenizer):
         super().__init__()
         self.encoder = encoder # Encoder composed of a backbone and a Transformer encoder
         self.decoder = decoder # Decoder composed of an autoregressive Transformer decoder
+
+        self.tokenizer = tokenizer
 
         self.cfg = cfg
 
@@ -50,7 +59,6 @@ class Pix2Seq(L.LightningModule):
         return self.loss_meter_train.avg
     
     def validation_step(self, batch, batch_idx):
-        #model, valid_loader, criterion):
         image, tgt = batch
         tgt_input = tgt[:, :-1]
         tgt_expected = tgt[:, 1:]
@@ -58,9 +66,15 @@ class Pix2Seq(L.LightningModule):
         preds = self(image, tgt_input)
         loss = self.criterion(preds.reshape(-1, preds.shape[-1]), tgt_expected.reshape(-1))
 
+        self.loss_meter_val.update(loss.item(), image.size(0))   
 
-        self.loss_meter_val.update(loss.item(), image.size(0))
+        obj_class, bbox = self.tokenizer.decode_batch(preds)
+        gt_obj_class, gt_bbox = self.tokenizer.decode_batch(tgt)
+        vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox[0], gt_obj_class[0], GT_COLOR, show=True)
+        vis_image  = self.visualize(vis_image, bbox[0], obj_class[0], PRED_COLOR, show=True)
+
         self.log('val_loss', self.loss_meter_val.avg, sync_dist=True)
+        self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)
         return self.loss_meter_val.avg
     
     def configure_optimizers(self):
@@ -73,3 +87,37 @@ class Pix2Seq(L.LightningModule):
     
     def criterion(self, preds, tgt):
         return self.loss_criterion(preds, tgt)
+
+
+    def visualize_bbox(self, img, bbox, class_name, color, thickness=1):
+        """Visualizes a single bounding box on the image"""
+        bbox = [int(item) for item in bbox]
+        x_min, y_min, x_max, y_max = bbox
+    
+        cv2.rectangle(img, (x_min, y_min), (x_max, y_max), color=color, thickness=thickness)
+        
+        ((text_width, text_height), _) = cv2.getTextSize(class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)    
+        cv2.rectangle(img, (x_min, y_min), (x_min + text_width, y_min + int(text_height * 1.3)), color, -1)
+        cv2.putText(
+            img,
+            text=class_name,
+            org=(x_min, y_min+ int(text_height * 1.3)),
+            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=0.35, 
+            color=TEXT_COLOR, 
+            lineType=cv2.LINE_AA,
+        )
+        return img
+
+
+    def visualize(self, image, bboxes, category_ids, category_id_to_name, color=PRED_COLOR, show=True):
+        img = image.copy()
+        for bbox, category_id in zip(bboxes, category_ids):
+            class_name = category_id_to_name[category_id]
+            img = self.visualize_bbox(img, bbox, class_name, color)
+        if show:
+            plt.figure(figsize=(12, 12))
+            plt.axis('off')
+            plt.imshow(img)
+            plt.show()
+        return img

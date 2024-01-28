@@ -57,10 +57,12 @@ class YCBDataset(Dataset):
         obj_class = sample['obj_class']
         bboxes = sample['bbox']
 
+        print(f"Current sample {idx} with image path {img_path} and object class {obj_class} and bbox {bboxes}")
+
         if self.transforms is not None:
             transformed = self.transforms(**{
                 'image': img,
-                'bboxes': bboxes,
+                'bboxes': [bboxes],
                 'obj_class': obj_class
             })
             img = transformed['image']

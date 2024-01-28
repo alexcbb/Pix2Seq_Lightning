@@ -7,9 +7,9 @@ class CFG:
     img_size = 384
     num_bins = img_size
     
-    batch_size = 512
+    batch_size = 384
     epochs = 30
-    precision = 32
+    precision = 16
     gpus = 4
     nodes = 1
     strategy = "ddp"
@@ -21,7 +21,7 @@ class CFG:
     weight_decay = 1e-4
     
     num_classes = 21
-    num_workers = 0
+    num_workers = 1
     
     generation_steps = 101
     run_eval = False

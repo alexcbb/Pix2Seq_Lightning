@@ -70,6 +70,7 @@ class Pix2Seq(L.LightningModule):
 
         obj_class, bbox = self.tokenizer.decode(preds[0])
         gt_obj_class, gt_bbox = self.tokenizer.decode(tgt[0])
+        print(f"Prepare visualization for {obj_class} related to {gt_obj_class} with bbox {bbox} and gt {gt_bbox}")
         vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox, gt_obj_class, GT_COLOR, show=True)
         vis_image  = self.visualize(vis_image, bbox, obj_class, PRED_COLOR, show=True)
 
@@ -91,6 +92,7 @@ class Pix2Seq(L.LightningModule):
 
     def visualize_bbox(self, img, bbox, class_name, color, thickness=1):
         """Visualizes a single bounding box on the image"""
+        print(f"Create bbox for {class_name} with bbox {bbox}")
         bbox = [int(item) for item in bbox]
         x_min, y_min, x_max, y_max = bbox
     

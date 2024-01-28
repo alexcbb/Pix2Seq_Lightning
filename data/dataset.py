@@ -36,7 +36,7 @@ class YCBDataset(Dataset):
                     obj_trans = gt_pose[scene][obj]['cam_t_m2c']
                     obj_rot = gt_pose[scene][obj]['cam_R_m2c']
                     img_path = scenes_train[i] + 'rgb/' + scene + '.png'
-                    self.labels.extend(
+                    self.labels.append(
                         {
                         "bbox" : bbox, 
                         "obj_class": obj_class,

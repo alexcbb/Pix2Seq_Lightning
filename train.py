@@ -21,9 +21,9 @@ class CFG:
     num_bins = img_size
     
     batch_size = 1024
-    epochs = 25
+    epochs = 30
     precision = 16
-    gpus = 1
+    gpus = 4
     nodes = 1
     strategy = "ddp"
     
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     ### Prepare the checkpointing
     checkpoint_callback = ModelCheckpoint(
         save_top_k=3,
-        every_n_epochs=50,
+        every_n_epochs=1,
         save_last=True,
         mode="min",
         monitor="train_loss",

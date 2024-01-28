@@ -67,7 +67,7 @@ class YCBDataset(Dataset):
             transformed = self.transforms(
                 image=img,
                 bboxes=bboxes,
-                class_labels=obj_class
+                obj_class=obj_class
             )
             img = transformed['image']
             bboxes = transformed['bboxes']

@@ -26,7 +26,7 @@ class Pix2Seq(L.LightningModule):
         self.loss_meter_train = AvgMeter("train_loss")
         self.loss_meter_val = AvgMeter("val_loss")
 
-        self.loss_criterion = nn.CrossEntropyLoss(ignore_index=self.cfg.pad_idx)
+        self.loss_criterion = nn.CrossEntropyLoss(ignore_index=self.tokenizer.PAD_code)
 
         self.automatic_optimization = False
     

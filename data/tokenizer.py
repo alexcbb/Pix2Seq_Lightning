@@ -8,6 +8,8 @@ class Tokenizer:
             num_bins: int, 
             width: int, 
             height: int, 
+            rotation_bins: int = 0,
+            translation_bins: int = 0,
             tx: int = 0,
             ty: int = 0,
             tz: int = 0,

@@ -10,8 +10,7 @@ class Encoder(nn.Module):
             out_dim=256
         ):
         super().__init__()
-        self.model = timm.create_model(
-            model_name, num_classes=0, global_pool='', pretrained=pretrained)
+        self.model = timm.create_model(model_name, num_classes=0, global_pool='', pretrained=pretrained)
         self.bottleneck = nn.AdaptiveAvgPool1d(out_dim)
 
     def forward(self, x):

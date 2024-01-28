@@ -110,10 +110,10 @@ class Pix2Seq(L.LightningModule):
         return img
 
 
-    def visualize(self, image, bboxes, category_ids, category_id_to_name, color=PRED_COLOR, show=True):
+    def visualize(self, image, bboxes, category_ids, color=PRED_COLOR, show=True):
         img = image.copy()
         for bbox, category_id in zip(bboxes, category_ids):
-            class_name = category_id_to_name[category_id]
+            class_name = self.cfg.id2cls[category_id]
             img = self.visualize_bbox(img, bbox, class_name, color)
         if show:
             plt.figure(figsize=(12, 12))

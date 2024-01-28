@@ -8,3 +8,4 @@ VOCdevkit
 results
 checkpoints/*
 logs/*
+dataset/*

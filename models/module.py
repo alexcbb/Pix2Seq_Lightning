@@ -120,7 +120,7 @@ class Pix2Seq(L.LightningModule):
         print(f"Create visualization for {category_ids} with bbox {bboxes}")
         for bbox, category_id in zip(bboxes, category_ids):
             if category_id > 0:
-                class_name = self.cfg.id2cls[category_id]
+                class_name = self.cfg.id2cls[str(category_id)]
                 img = self.visualize_bbox(img, bbox, class_name, color)
         if show:
             plt.figure(figsize=(12, 12))

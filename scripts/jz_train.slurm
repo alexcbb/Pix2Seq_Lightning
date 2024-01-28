@@ -21,6 +21,4 @@ module purge
 # module load cpuarch/amd # To be compatible with a100 nodes
 module load pytorch-gpu/py3/2.0.0
 
-
 srun python train.py
-

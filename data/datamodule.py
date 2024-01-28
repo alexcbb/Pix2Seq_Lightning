@@ -94,7 +94,7 @@ class YCBDatamodule(L.LightningDataModule):
             shuffle=False,
             collate_fn=partial(collate_fn, max_len=self.cfg.max_len, pad_idx=self.tokenizer.PAD_code),
             num_workers=self.cfg.num_workers,
-            pin_memory=True,
+            pin_memory=False,
         )
     
     def test_dataloader(self):
@@ -104,5 +104,5 @@ class YCBDatamodule(L.LightningDataModule):
             shuffle=False,
             collate_fn=partial(collate_fn, max_len=self.cfg.max_len, pad_idx=self.tokenizer.PAD_code),
             num_workers=self.cfg.num_workers,
-            pin_memory=True,
+            pin_memory=False,
         )

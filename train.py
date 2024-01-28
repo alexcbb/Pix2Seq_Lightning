@@ -20,6 +20,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------
     # Prepare data
     datamodule = YCBDatamodule(cfg)
+    CFG.pad_idx = datamodule.tokenizer.PAD_code
     datamodule.setup("fit")
     
     cfg.num_training_steps = CFG.epochs * \

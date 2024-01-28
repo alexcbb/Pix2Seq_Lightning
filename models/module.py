@@ -70,9 +70,10 @@ class Pix2Seq(L.LightningModule):
 
         obj_class, bbox = self.tokenizer.decode(preds[0])
         gt_obj_class, gt_bbox = self.tokenizer.decode(tgt[0])
-        print(f"Prepare visualization for {obj_class} related to {gt_obj_class} with bbox {bbox} and gt {gt_bbox}")
+        print("Prepare vis")
         vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox, gt_obj_class, GT_COLOR, show=True)
         vis_image  = self.visualize(vis_image, bbox, obj_class, PRED_COLOR, show=True)
+        print(f"Finish visualization")
 
         self.log('val_loss', self.loss_meter_val.avg, sync_dist=True)
         self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)
@@ -94,9 +95,11 @@ class Pix2Seq(L.LightningModule):
         """Visualizes a single bounding box on the image"""
         bbox = [int(item) for item in bbox]
         x_min, y_min, x_max, y_max = bbox
-    
+
+        print("Create rectangle")
         cv2.rectangle(img, (x_min, y_min), (x_max, y_max), color=color, thickness=thickness)
         
+        print("Create Text")
         ((text_width, text_height), _) = cv2.getTextSize(class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)    
         cv2.rectangle(img, (x_min, y_min), (x_min + text_width, y_min + int(text_height * 1.3)), color, -1)
         cv2.putText(
@@ -108,6 +111,7 @@ class Pix2Seq(L.LightningModule):
             color=TEXT_COLOR, 
             lineType=cv2.LINE_AA,
         )
+        print("Finish vis")
         return img
 
 
@@ -115,9 +119,9 @@ class Pix2Seq(L.LightningModule):
         img = image.copy()
         print(f"Create visualization for {category_ids} with bbox {bboxes}")
         for bbox, category_id in zip(bboxes, category_ids):
-            class_name = self.cfg.id2cls[str(max(category_id, 0))]
-            img = self.visualize_bbox(img, bbox, class_name, color)
-            break
+            if category_id > 0:
+                class_name = self.cfg.id2cls[category_id]
+                img = self.visualize_bbox(img, bbox, class_name, color)
         if show:
             plt.figure(figsize=(12, 12))
             plt.axis('off')

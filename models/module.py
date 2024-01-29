@@ -92,11 +92,11 @@ class Pix2Seq(L.LightningModule):
         bbox = [int(item) for item in bbox]
         x_min, y_min, x_max, y_max = bbox
 
-        cv2.rectangle(img, (x_min, y_min), (x_max, y_max), color=color, thickness=thickness)
+        img = cv2.rectangle(img, (x_min, y_min), (x_max, y_max), color=color, thickness=thickness)
         
         ((text_width, text_height), _) = cv2.getTextSize(class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)    
-        cv2.rectangle(img, (x_min, y_min), (x_min + text_width, y_min + int(text_height * 1.3)), color, -1)
-        cv2.putText(
+        img = cv2.rectangle(img, (x_min, y_min), (x_min + text_width, y_min + int(text_height * 1.3)), color, -1)
+        img = cv2.putText(
             img,
             text=class_name,
             org=(x_min, y_min+ int(text_height * 1.3)),
@@ -112,6 +112,6 @@ class Pix2Seq(L.LightningModule):
         img = image.copy()
         for bbox, category_id in zip(bboxes, category_ids):
             if category_id > 0:
-                class_name = self.cfg.id2cls[str(category_id)]
+                class_name = self.cfg.id2cls[str(category_id-1)]
                 img = self.visualize_bbox(img, bbox, class_name, color)
         return img

@@ -7,7 +7,7 @@ class CFG:
     img_size = 384
     num_bins = img_size
     
-    batch_size = 256
+    batch_size = 128
     epochs = 30
     precision = 16
     gpus = 4

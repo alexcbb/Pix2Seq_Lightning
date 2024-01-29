@@ -55,7 +55,7 @@ class Pix2Seq(L.LightningModule):
         
         self.log('train_loss', self.loss_meter_train.avg, sync_dist=True)
         self.log('lr', lr, sync_dist=True)
-        return self.loss_meter_train.avg
+        return loss.item()
     
     def validation_step(self, batch, batch_idx):
         image, tgt = batch
@@ -75,7 +75,7 @@ class Pix2Seq(L.LightningModule):
         self.log('val_loss', self.loss_meter_val.avg, sync_dist=True)
         self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)
         self.logger.log_image("Original image", [image[0].permute(1, 2, 0).cpu().numpy()], self.global_step)
-        return self.loss_meter_val.avg
+        return loss.item()
     
     def configure_optimizers(self):
         # TODO : implement the optimizer

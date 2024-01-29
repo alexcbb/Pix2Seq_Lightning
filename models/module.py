@@ -60,6 +60,7 @@ class Pix2Seq(L.LightningModule):
     
     def validation_step(self, batch, batch_idx):
         image, tgt = batch
+        print(f"Image shape: {image.shape}")
         tgt_input = tgt[:, :-1]
         tgt_expected = tgt[:, 1:]
 
@@ -115,16 +116,11 @@ class Pix2Seq(L.LightningModule):
         return img
 
 
-    def visualize(self, image, bboxes, category_ids, color=PRED_COLOR, show=True):
+    def visualize(self, image, bboxes, category_ids, color=PRED_COLOR):
         img = image.copy()
         print(f"Create visualization for {category_ids} with bbox {bboxes}")
         for bbox, category_id in zip(bboxes, category_ids):
             if category_id > 0:
                 class_name = self.cfg.id2cls[str(category_id)]
                 img = self.visualize_bbox(img, bbox, class_name, color)
-        if show:
-            plt.figure(figsize=(12, 12))
-            plt.axis('off')
-            plt.imshow(img)
-            plt.show()
         return img

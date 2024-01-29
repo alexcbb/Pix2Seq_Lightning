@@ -60,7 +60,6 @@ class Pix2Seq(L.LightningModule):
     
     def validation_step(self, batch, batch_idx):
         image, tgt = batch
-        print(f"Image shape: {image.shape}")
         tgt_input = tgt[:, :-1]
         tgt_expected = tgt[:, 1:]
 
@@ -71,13 +70,12 @@ class Pix2Seq(L.LightningModule):
 
         obj_class, bbox = self.tokenizer.decode(preds[0])
         gt_obj_class, gt_bbox = self.tokenizer.decode(tgt[0])
-        print("Prepare vis")
         vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox, gt_obj_class, GT_COLOR)
         vis_image  = self.visualize(vis_image, bbox, obj_class, PRED_COLOR)
-        print(f"Finish visualization")
 
         self.log('val_loss', self.loss_meter_val.avg, sync_dist=True)
         self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)
+        self.logger.log_image("Original image", [image[0]], self.global_step)
         return self.loss_meter_val.avg
     
     def configure_optimizers(self):
@@ -97,10 +95,8 @@ class Pix2Seq(L.LightningModule):
         bbox = [int(item) for item in bbox]
         x_min, y_min, x_max, y_max = bbox
 
-        print("Create rectangle")
         cv2.rectangle(img, (x_min, y_min), (x_max, y_max), color=color, thickness=thickness)
         
-        print("Create Text")
         ((text_width, text_height), _) = cv2.getTextSize(class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)    
         cv2.rectangle(img, (x_min, y_min), (x_min + text_width, y_min + int(text_height * 1.3)), color, -1)
         cv2.putText(
@@ -112,13 +108,11 @@ class Pix2Seq(L.LightningModule):
             color=TEXT_COLOR, 
             lineType=cv2.LINE_AA,
         )
-        print("Finish vis")
         return img
 
 
     def visualize(self, image, bboxes, category_ids, color=PRED_COLOR):
         img = image.copy()
-        print(f"Create visualization for {category_ids} with bbox {bboxes}")
         for bbox, category_id in zip(bboxes, category_ids):
             if category_id > 0:
                 class_name = self.cfg.id2cls[str(category_id)]

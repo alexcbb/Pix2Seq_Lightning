@@ -9,7 +9,7 @@ class CFG:
     
     batch_size = 128
     epochs = 30
-    precision = 16
+    precision = "16-mixed"
     gpus = 4
     nodes = 1
     strategy = "ddp"

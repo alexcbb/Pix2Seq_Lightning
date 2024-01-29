@@ -46,9 +46,8 @@ class Pix2Seq(L.LightningModule):
         loss = self.criterion(preds.reshape(-1, preds.shape[-1]), tgt_expected.reshape(-1))
 
         optimizer.zero_grad()
-        loss.backward()
+        self.manual_backward(loss)
         optimizer.step()
-            
         self.lr_scheduler.step()
 
         self.loss_meter_train.update(loss.item(), image.size(0))

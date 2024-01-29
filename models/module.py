@@ -65,15 +65,20 @@ class Pix2Seq(L.LightningModule):
         loss = self.criterion(preds.reshape(-1, preds.shape[-1]), tgt_expected.reshape(-1))
 
         self.loss_meter_val.update(loss.item(), image.size(0))   
-
-        obj_class, bbox = self.tokenizer.decode(preds[0])
-        gt_obj_class, gt_bbox = self.tokenizer.decode(tgt[0])
-        vis_image = self.visualize(image[0].permute(1, 2, 0).cpu().numpy(), gt_bbox, gt_obj_class, GT_COLOR)
-        vis_image  = self.visualize(vis_image, bbox, obj_class, PRED_COLOR)
+        self.last_val_pred = preds
+        self.last_val_tgt = tgt
+        self.last_val_img = image   
 
         self.log('val_loss', self.loss_meter_val.avg, sync_dist=True)
-        self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)
-        self.logger.log_image("Original image", [image[0].permute(1, 2, 0).cpu().numpy()], self.global_step)
+
+    def on_validation_epoch_end(self):
+        if self.global_rank == 0:
+            obj_class, bbox = self.tokenizer.decode(self.last_val_pred[0])
+            gt_obj_class, gt_bbox = self.tokenizer.decode(self.last_val_tgt[0])
+            vis_image = self.visualize(self.last_val_img[0].permute(1, 2, 0).cpu().numpy(), gt_bbox, gt_obj_class, GT_COLOR)
+            vis_image  = self.visualize(vis_image, bbox, obj_class, PRED_COLOR)
+            self.logger.log_image("Ground Truth vs Prediction", [vis_image], self.global_step)
+            self.logger.log_image("Original image", [self.last_val_img[0].permute(1, 2, 0).cpu().numpy()], self.global_step)
     
     def configure_optimizers(self):
         # TODO : implement the optimizer
